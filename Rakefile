@@ -1,4 +1,4 @@
-desc "Builds ultralist for release"
+desc "Builds ultralist-interactive for release"
 
 Envs = [
   { goos: "darwin", arch: "386" },
@@ -19,20 +19,29 @@ task :build do
     ENV["GOOS"] = env[:goos]
     ENV["GOARCH"] = env[:arch]
     puts "Building #{env[:goos]} #{env[:arch]}"
-    `GOOS=#{env[:goos]} GOARCH=#{env[:arch]} CGO_ENABLED=0 go build -v -o dist/#{Version}/ultralist`
+    `GOOS=#{env[:goos]} GOARCH=#{env[:arch]} CGO_ENABLED=0 go build -v -o dist/#{Version}/uli`
     if env[:goos] == "windows"
       puts "Creating windows executable"
-      `mv dist/#{Version}/ultralist dist/#{Version}/ultralist.exe`
-      `cd dist/#{Version} && zip ultralist_win.zip ultralist.exe`
+      `mv dist/#{Version}/uli dist/#{Version}/uli.exe`
+      `cd dist/#{Version} && zip uli.zip uli.exe`
       puts "Removing windows executable"
-      `rm -rf dist/#{Version}/ultralist.exe`
+      `rm -rf dist/#{Version}/uli.exe`
     else
       puts "Tarring #{env[:goos]} #{env[:arch]}"
-      `cd dist/#{Version} && tar -czvf ultralist#{env[:goos]}_#{env[:arch]}.tar.gz ultralist`
-      puts "Removing dist/#{Version}/ultralist"
-      `rm -rf dist/#{Version}/ultralist`
+      `cd dist/#{Version} && tar -czvf uli#{env[:goos]}_#{env[:arch]}.tar.gz uli`
+      puts "Removing dist/#{Version}/uli"
+      `rm -rf dist/#{Version}/uli`
     end
   end
+end
+
+task :lb do
+  `rm -rf ./uli`
+  le = { goos: "darwin", arch: "amd64" }
+  ENV["GOOS"] = le[:goos]
+  ENV["GOARCH"] = le[:arch]
+  puts "Building #{le[:goos]} #{le[:arch]}"
+  `GOOS=#{le[:goos]} GOARCH=#{le[:arch]} CGO_ENABLED=0 go build -v -o ./uli`
 end
 
 desc "Tests all the things"
