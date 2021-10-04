@@ -126,6 +126,8 @@ func termboxSample() {
 }
 
 func termboxSample2() {
+  var keep_going = true
+
   defer termbox.Close()
   termbox.SetInputMode(termbox.InputEsc)
 
@@ -155,6 +157,11 @@ mainloop:
         edit_box.MoveCursorToBeginningOfTheLine()
       case termbox.KeyEnd, termbox.KeyCtrlE:
         edit_box.MoveCursorToEndOfTheLine()
+      case termbox.KeyEnter://, termbox.KeyReturn:
+        keep_going = process_editbox_text()
+        if !keep_going {
+          break mainloop
+        }
       default:
         if ev.Ch != 0 {
           edit_box.InsertRune(ev.Ch)
@@ -165,6 +172,21 @@ mainloop:
     }
     redraw_all()
   }
+}
+
+func process_editbox_text() bool {
+  t := edit_box.TextString()
+  trimmed_downcased := strings.ToLower(strings.TrimSpace(t))
+  switch trimmed_downcased {
+    case "exit", "quit":
+      return false
+      // add another case here for custom commands.
+    default:
+      edit_box.MoveCursorToBeginningOfTheLine()
+      edit_box.DeleteTheRestOfTheLine()
+    }
+    return true
+
 }
 
 

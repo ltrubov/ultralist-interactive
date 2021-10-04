@@ -227,44 +227,60 @@ func (eb *EditBox) CursorX() int {
   return eb.cursor_voffset - eb.line_voffset
 }
 
+func (eb *EditBox) TextString() string {
+  return string(eb.text)
+}
+
 var edit_box EditBox
 
-const edit_box_width = 30
+//const edit_box_width = 30
+const top_instruction = "Type in ultralist commands"
+const bottom_instruction = "Type help for more info or exit to quit"
 
 func redraw_all() {
   const coldef = termbox.ColorDefault
   termbox.Clear(coldef, coldef)
   w, h := termbox.Size()
+  redraw_edit_box(w,h,coldef)
+  redraw_panels()
 
-  midy := h / 2
-  midx := (w - edit_box_width) / 2
+  termbox.Flush()
+}
+
+func redraw_edit_box(w,h int, coldef termbox.Attribute) {
+  const colbg = termbox.ColorDarkGray
+
+  edit_box_width := w-2
+  midy := h-2//h / 2
+  zerox := (w - edit_box_width) / 2
 
   // unicode box drawing chars around the edit box
   if runewidth.EastAsianWidth {
-    termbox.SetCell(midx-1, midy, '|', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy, '|', coldef, coldef)
-    termbox.SetCell(midx-1, midy-1, '+', coldef, coldef)
-    termbox.SetCell(midx-1, midy+1, '+', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy-1, '+', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy+1, '+', coldef, coldef)
-    fill(midx, midy-1, edit_box_width, 1, termbox.Cell{Ch: '-'})
-    fill(midx, midy+1, edit_box_width, 1, termbox.Cell{Ch: '-'})
+    termbox.SetCell(zerox-1, midy, '|', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy, '|', colbg, coldef)
+    termbox.SetCell(zerox-1, midy-1, '+', colbg, coldef)
+    termbox.SetCell(zerox-1, midy+1, '+', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy-1, '+', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy+1, '+', colbg, coldef)
+    fill(zerox, midy-1, edit_box_width, 1, termbox.Cell{Ch: '-'})
+    fill(zerox, midy+1, edit_box_width, 1, termbox.Cell{Ch: '-'})
   } else {
-    termbox.SetCell(midx-1, midy, '│', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy, '│', coldef, coldef)
-    termbox.SetCell(midx-1, midy-1, '┌', coldef, coldef)
-    termbox.SetCell(midx-1, midy+1, '└', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy-1, '┐', coldef, coldef)
-    termbox.SetCell(midx+edit_box_width, midy+1, '┘', coldef, coldef)
-    fill(midx, midy-1, edit_box_width, 1, termbox.Cell{Ch: '─'})
-    fill(midx, midy+1, edit_box_width, 1, termbox.Cell{Ch: '─'})
+    termbox.SetCell(zerox-1, midy, '│', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy, '│', colbg, coldef)
+    termbox.SetCell(zerox-1, midy-1, '┌', colbg, coldef)
+    termbox.SetCell(zerox-1, midy+1, '└', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy-1, '┐', colbg, coldef)
+    termbox.SetCell(zerox+edit_box_width, midy+1, '┘', colbg, coldef)
+    fill(zerox, midy-1, edit_box_width, 1, termbox.Cell{Ch: '─'})
+    fill(zerox, midy+1, edit_box_width, 1, termbox.Cell{Ch: '─'})
   }
 
-  edit_box.Draw(midx, midy, edit_box_width, 1)
-  termbox.SetCursor(midx+edit_box.CursorX(), midy)
+  edit_box.Draw(zerox, midy, edit_box_width, 1)
+  termbox.SetCursor(zerox+edit_box.CursorX(), midy)
 
-  tbprint(midx+6, midy+3, coldef, coldef, "Press ESC to quit")
-  termbox.Flush()
+  tbprint(zerox + edit_box_width/2 - len(top_instruction)/2, midy-1, colbg, coldef, top_instruction)
+  tbprint(zerox + edit_box_width/2 - len(bottom_instruction)/2, midy+1, colbg, coldef, bottom_instruction)
+  //
 }
 
 var arrowLeft = '←'
