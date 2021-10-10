@@ -126,16 +126,17 @@ func termboxSample() {
 }
 
 func termboxSample2() {
-  var keep_going = true
+  var command_result = 0
 
   defer termbox.Close()
   termbox.SetInputMode(termbox.InputEsc)
 
-  redraw_all()
+  redraw_all(command_result)
 mainloop:
   for {
     switch ev := termbox.PollEvent(); ev.Type {
     case termbox.EventKey:
+      command_result = 0
       switch ev.Key {
       case termbox.KeyEsc:
         break mainloop
@@ -158,8 +159,8 @@ mainloop:
       case termbox.KeyEnd, termbox.KeyCtrlE:
         edit_box.MoveCursorToEndOfTheLine()
       case termbox.KeyEnter://, termbox.KeyReturn:
-        keep_going = process_editbox_text()
-        if !keep_going {
+        command_result = process_editbox_text()
+        if command_result < 0 {
           break mainloop
         }
       default:
@@ -170,22 +171,22 @@ mainloop:
     case termbox.EventError:
       panic(ev.Err)
     }
-    redraw_all()
+    redraw_all(command_result)
   }
 }
 
-func process_editbox_text() bool {
+func process_editbox_text() int {
   t := edit_box.TextString()
   trimmed_downcased := strings.ToLower(strings.TrimSpace(t))
   switch trimmed_downcased {
     case "exit", "quit":
-      return false
+      return -1
       // add another case here for custom commands.
     default:
       edit_box.MoveCursorToBeginningOfTheLine()
       edit_box.DeleteTheRestOfTheLine()
     }
-    return true
+    return 1
 
 }
 

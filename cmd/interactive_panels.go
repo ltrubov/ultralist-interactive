@@ -5,60 +5,65 @@ import (
 
   //"github.com/mattn/go-runewidth"
   "github.com/nsf/termbox-go"
+  "github.com/ultralist/ultralist/ultralist"
 )
 
-type Panel struct {
-  text     string
-  title    string
-  zerox    int
-  active   bool
-}
+// type Panel struct {
+//   text     string
+//   title    string
+//   zerox    int
+//   panwid   int
+//   active   bool
+// }
 
-var left_panel, center_panel, right_panel Panel
-var full_panel Panel
+var left_panel, center_panel, right_panel ultralist.Panel
+var full_panel ultralist.Panel
 
-func redraw_panels() {
+func redraw_panel_gallery() {
 
   w, _ := termbox.Size()
   pw := w/3
 
-  left_panel.SetupWith(0, "TODAY", "Batman")
-  center_panel.SetupWith(pw, "THIS WEEK", "Superman")
-  right_panel.SetupWith(2*pw, "THIS MONTH", "Flash")
-  full_panel.SetupWith(0, "HELP", "Help")
-  full_panel.active = false
+  // left_panel = ultralist.Panel{Zerox: 0, Panwid: pw, Title: "TODAY"}
+  // center_panel = ultralist.Panel{Zerox: pw, Panwid: pw, Title: "THIS WEEK"}
+  // right_panel = ultralist.Panel{Zerox: 2*pw, Panwid: pw, Title: "THIS MONTH"}
 
-  panels := [4]Panel{left_panel, right_panel, center_panel, full_panel}
-
-  for _,p := range panels {
-    if !p.active {
-      p.Draw()
-    }
+  for i,pt := range [3]string{"TODAY", "THIS WEEK", "THIS MONTH"} {
+    panel := ultralist.Panel{Zerox: i*pw, Panwid: pw, Title: pt}
+    //panel.Draw("text of doom")
+    ultralist.NewAppForPanel(true, panel).ListTodos("due:agenda group:context", true, true)
   }
+
+  //full_panel = ultralist.Panel{Zerox: 0, Panwid: w, Title: "HELP"}
+  //left_panel.SetupWith(0, pw, "TODAY", "Batman")
+  // center_panel.SetupWith(pw, pw, "THIS WEEK", "Superman")
+  // right_panel.SetupWith(2*pw, pw, "THIS MONTH", "Flash")
+  // full_panel.SetupWith(0, w, "HELP", "Help")
+  // full_panel.active = false
+
+//   panels := [4]ultralist.Panel{left_panel, right_panel, center_panel, full_panel}
+//
+//   for _,p := range panels {
+//     if !p.active {
+//       p.Draw()
+//     }
+//   }
 }
 
-func draw_full_panel() {
-  //w, _ := termbox.Size()
-  full_panel.zerox = 0
+func redraw_full_panel() {
+  w, _ := termbox.Size()
+
+  panel := ultralist.Panel{Zerox: 0, Panwid: w, Title: "HELP"}
+  panel.Draw("text of nice")
 }
 
-func (p *Panel) SetupWith(zx int, tt string, textStr string) {
-  p.zerox = zx
-  p.title = tt
-  p.text = textStr
-  p.active = true
-}
+// func (p *Panel) SetupWith(zx int, w int, tt string, textStr string) {
+//   p.zerox = zx
+//   p.panwid = w
+//   p.title = tt
+//   p.text = textStr
+//   p.active = true
+// }
 
-func (p *Panel) Draw() {
-  const coldef = termbox.ColorDefault
-  w, h := termbox.Size()
-  pw := w/3
-  tbprint(p.zerox + pw/2 - len(p.title)/2, 1, coldef, coldef, p.title)
 
-  y := 3
-  for y < h-3 {
-    tbprint(p.zerox, y, coldef, coldef, p.text)
-    y++
-  }
-}
 

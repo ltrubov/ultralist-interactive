@@ -2,7 +2,7 @@ package ultralist
 
 import (
 	"fmt"
-	"io"
+	//"io"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,14 +15,15 @@ import (
 
 // ScreenPrinter is the default struct of this file
 type SimpleScreenPrinter struct {
-	Writer         *io.Writer
+	//Writer         *io.Writer
 	UnicodeSupport bool
 }
 
 // NewScreenPrinter creates a new screeen printer.
 func NewSimpleScreenPrinter(unicodeSupport bool) *SimpleScreenPrinter {
-	w := new(io.Writer)
-	formatter := &SimpleScreenPrinter{Writer: w, UnicodeSupport: unicodeSupport}
+	//w := new(io.Writer)
+	//formatter := &SimpleScreenPrinter{Writer: w, UnicodeSupport: unicodeSupport}
+	formatter := &SimpleScreenPrinter{UnicodeSupport: unicodeSupport}
 	return formatter
 }
 

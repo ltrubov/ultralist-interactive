@@ -53,6 +53,18 @@ func NewAppWithPrintOptions(unicodeSupport bool, colorSupport bool) *App {
 	return app
 }
 
+func NewAppForPanel(unicodeSupport bool, p Panel) *App {
+	//var printer Printer
+	printer := NewPanelPrinter(unicodeSupport, p)
+
+	app := &App{
+		TodoList:  &TodoList{},
+		Printer:   printer,
+		TodoStore: NewFileStore(),
+	}
+	return app
+}
+
 // InitializeRepo is initializing ultralist repo.
 func (a *App) InitializeRepo() {
 	a.TodoStore.Initialize()
