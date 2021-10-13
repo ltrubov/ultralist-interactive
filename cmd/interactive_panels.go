@@ -24,14 +24,10 @@ func redraw_panel_gallery() {
   w, _ := termbox.Size()
   pw := w/3
 
-  // left_panel = ultralist.Panel{Zerox: 0, Panwid: pw, Title: "TODAY"}
-  // center_panel = ultralist.Panel{Zerox: pw, Panwid: pw, Title: "THIS WEEK"}
-  // right_panel = ultralist.Panel{Zerox: 2*pw, Panwid: pw, Title: "THIS MONTH"}
-
   for i,pt := range [3]string{"TODAY", "THIS WEEK", "THIS MONTH"} {
-    panel := ultralist.Panel{Zerox: i*pw, Panwid: pw, Title: pt}
+    panel := ultralist.NewPanel(pt, i*pw, pw-1)// ultralist.Panel{Zerox: i*pw, Panwid: pw, Title: pt}
     //panel.Draw("text of doom")
-    ultralist.NewAppForPanel(true, panel).ListTodos("due:agenda group:context", true, true)
+    ultralist.NewAppForPanel(true, panel).ListTodos("due:agenda group:project", true, true)
   }
 
   //full_panel = ultralist.Panel{Zerox: 0, Panwid: w, Title: "HELP"}
@@ -54,7 +50,7 @@ func redraw_full_panel() {
   w, _ := termbox.Size()
 
   panel := ultralist.Panel{Zerox: 0, Panwid: w, Title: "HELP"}
-  panel.Draw("text of nice")
+  panel.Draw("text of nice", termbox.ColorGreen)
 }
 
 // func (p *Panel) SetupWith(zx int, w int, tt string, textStr string) {

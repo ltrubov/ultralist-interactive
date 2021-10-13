@@ -53,7 +53,7 @@ func NewAppWithPrintOptions(unicodeSupport bool, colorSupport bool) *App {
 	return app
 }
 
-func NewAppForPanel(unicodeSupport bool, p Panel) *App {
+func NewAppForPanel(unicodeSupport bool, p *Panel) *App {
 	//var printer Printer
 	printer := NewPanelPrinter(unicodeSupport, p)
 
