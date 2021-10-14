@@ -124,6 +124,10 @@ mainloop:
   for {
     switch ev := termbox.PollEvent(); ev.Type {
     case termbox.EventKey:
+      if edit_box.clear_if_need {
+        edit_box.ClearBox()
+        //continue
+      }
       switch ev.Key {
       case termbox.KeyEsc:
         break mainloop
@@ -149,6 +153,8 @@ mainloop:
         command_result = process_editbox_text()
         if command_result < 0 {
           break mainloop
+        } else if command_result > 0 {
+          edit_box.clear_if_need = true
         }
       default:
         if ev.Ch != 0 {
@@ -165,32 +171,32 @@ mainloop:
 func process_editbox_text() int {
   t := edit_box.TextString()
   trimmed_downcased := strings.ToLower(strings.TrimSpace(t))
+  var res = 0
   switch trimmed_downcased {
     case "exit", "quit":
       return -1
-      // add another case here for custom commands.
     case "help":
       fpc.Active = true
       fpc.CurrCmd = trimmed_downcased
-
     case "glance":
       fpc.Active = false
     default:
       interpret_command(t)
-      if !fpc.Active {
-        run_command_in_background(t)
-      }
+
+      //commands that result in fullscreen display are excluded
+      res = run_command_in_background(t)
     }
 
     edit_box.MoveCursorToBeginningOfTheLine()
     edit_box.DeleteTheRestOfTheLine()
 
-    return 1
+    return res
 }
 
 func redraw_all() {
   const coldef = termbox.ColorDefault
   termbox.Clear(coldef, coldef)
+
   w, h := termbox.Size()
   if fpc.Active {
     redraw_full_panel()
@@ -223,7 +229,7 @@ func interpret_command(cmd string) {
   }
 }
 
-func run_command_in_background(cmd string) {
+func run_command_in_background(cmd string) int {
   comps := Map(strings.Split(cmd, " "), strings.TrimSpace)
   cmd = comps[0]
   args := strings.Join(comps[1:], " ")
@@ -257,7 +263,7 @@ func run_command_in_background(cmd string) {
       todoID, err := strconv.Atoi(comps[1])
       if err != nil {
         //fmt.Printf("Could not parse todo ID: '%s'\n", args[0])
-        return
+        return -1
       }
       app.EditTodo(todoID, strings.Join(comps[2:], " "))
     case "init":
@@ -269,8 +275,9 @@ func run_command_in_background(cmd string) {
     case "web":
       app.OpenWeb()
     default:
-
+      return 0
   }
+  return 1
 }
 
 

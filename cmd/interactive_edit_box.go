@@ -2,6 +2,7 @@ package cmd
 
 import (
   "unicode/utf8"
+  //"strings"
 
   "github.com/mattn/go-runewidth"
   "github.com/nsf/termbox-go"
@@ -74,6 +75,7 @@ type EditBox struct {
   cursor_boffset int // cursor offset in bytes
   cursor_voffset int // visual cursor offset in termbox cells
   cursor_coffset int // cursor offset in unicode code points
+  clear_if_need  bool //clears on next insertion of a rune
 }
 
 // Draws the EditBox in the given location, 'h' is not used at the moment
@@ -212,6 +214,20 @@ func (eb *EditBox) DeleteRuneForward() {
 
 func (eb *EditBox) DeleteTheRestOfTheLine() {
   eb.text = eb.text[:eb.cursor_boffset]
+}
+
+func (eb *EditBox) ClearBox() {
+  if !eb.clear_if_need {
+    return
+  }
+
+  eb.clear_if_need = false
+  termbox.Sync()
+//   w, _ := termbox.Size()
+//   edit_box_width := w-2
+//
+//   eb.text = []byte(strings.Repeat("0", edit_box_width))
+//   eb.MoveCursorToBeginningOfTheLine()
 }
 
 func (eb *EditBox) InsertRune(r rune) {
