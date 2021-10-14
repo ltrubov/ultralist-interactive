@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ultralist/ultralist/ultralist"
-  "bufio"
-  "fmt"
+  //"bufio"
+  //"fmt"
   "os"
-  "os/exec"
+  //"os/exec"
   "github.com/nsf/termbox-go"
 )
 
@@ -46,84 +46,85 @@ func interactiveRunLoop() {
   termbox.Init()
   //termboxSample()
   termboxSample2()
+  os.Exit(0)
 
-  reader := bufio.NewReader(os.Stdin)
-  for {
-    fmt.Print("$ ")
-    cmdString, err := reader.ReadString('\n')
-    if err != nil {
-      fmt.Fprintln(os.Stderr, err)
-    }
-    err = runCommand(cmdString)
-    if err != nil {
-      fmt.Fprintln(os.Stderr, err)
-    }
-  }
+  // reader := bufio.NewReader(os.Stdin)
+  // for {
+  //   fmt.Print("$ ")
+  //   cmdString, err := reader.ReadString('\n')
+  //   if err != nil {
+  //     fmt.Fprintln(os.Stderr, err)
+  //   }
+  //   err = runCommand(cmdString)
+  //   if err != nil {
+  //     fmt.Fprintln(os.Stderr, err)
+  //   }
+  // }
 }
 
-func runCommand(commandStr string) error {
-  commandStr = strings.TrimSuffix(commandStr, "\n")
-  arrCommandStr := strings.Fields(commandStr)
-  switch arrCommandStr[0] {
-  case "exit", "quit":
-    os.Exit(0)
-    // add another case here for custom commands.
-  }
-  cmd := exec.Command(arrCommandStr[0], arrCommandStr[1:]...)
-  cmd.Stderr = os.Stderr
-  cmd.Stdout = os.Stdout
-  return cmd.Run()
-}
+// func runCommand(commandStr string) error {
+//   commandStr = strings.TrimSuffix(commandStr, "\n")
+//   arrCommandStr := strings.Fields(commandStr)
+//   switch arrCommandStr[0] {
+//   case "exit", "quit":
+//     os.Exit(0)
+//     // add another case here for custom commands.
+//   }
+//   cmd := exec.Command(arrCommandStr[0], arrCommandStr[1:]...)
+//   cmd.Stderr = os.Stderr
+//   cmd.Stdout = os.Stdout
+//   return cmd.Run()
+// }
 
-func termboxSample() {
-  var i, j int
-  var fg, bg termbox.Attribute
-  var colorRange []termbox.Attribute = []termbox.Attribute{
-    termbox.ColorDefault,
-    termbox.ColorBlack,
-    termbox.ColorRed,
-    termbox.ColorGreen,
-    termbox.ColorYellow,
-    termbox.ColorBlue,
-    termbox.ColorMagenta,
-    termbox.ColorCyan,
-    termbox.ColorWhite,
-    termbox.ColorDarkGray,
-    termbox.ColorLightRed,
-    termbox.ColorLightGreen,
-    termbox.ColorLightYellow,
-    termbox.ColorLightBlue,
-    termbox.ColorLightMagenta,
-    termbox.ColorLightCyan,
-    termbox.ColorLightGray,
-  }
-
-  var row, col int
-  var text string
-  for i, fg = range colorRange {
-    for j, bg = range colorRange {
-      row = i + 1
-      col = j * 8
-      text = fmt.Sprintf(" %02d/%02d ", fg, bg)
-      tbprint2(col, row+0, fg, bg, text)
-      /*text = fmt.Sprintf(" on ")
-      tbprint2(col, row+1, fg, bg, text)
-      text = fmt.Sprintf(" %2d ", bg)
-      tbprint2(col, row+2, fg, bg, text)*/
-      //fmt.Println(text, col, row)
-    }
-  }
-  for j, bg = range colorRange {
-    tbprint2(j*8, 0, termbox.ColorDefault, bg, "       ")
-    tbprint2(j*8, i+2, termbox.ColorDefault, bg, "       ")
-  }
-
-  tbprint2(15, i+4, termbox.ColorDefault, termbox.ColorDefault,
-    "Press any key to close...")
-  termbox.Flush()
-  termbox.PollEvent()
-  termbox.Close()
-}
+// func termboxSample() {
+//   var i, j int
+//   var fg, bg termbox.Attribute
+//   var colorRange []termbox.Attribute = []termbox.Attribute{
+//     termbox.ColorDefault,
+//     termbox.ColorBlack,
+//     termbox.ColorRed,
+//     termbox.ColorGreen,
+//     termbox.ColorYellow,
+//     termbox.ColorBlue,
+//     termbox.ColorMagenta,
+//     termbox.ColorCyan,
+//     termbox.ColorWhite,
+//     termbox.ColorDarkGray,
+//     termbox.ColorLightRed,
+//     termbox.ColorLightGreen,
+//     termbox.ColorLightYellow,
+//     termbox.ColorLightBlue,
+//     termbox.ColorLightMagenta,
+//     termbox.ColorLightCyan,
+//     termbox.ColorLightGray,
+//   }
+//
+//   var row, col int
+//   var text string
+//   for i, fg = range colorRange {
+//     for j, bg = range colorRange {
+//       row = i + 1
+//       col = j * 8
+//       text = fmt.Sprintf(" %02d/%02d ", fg, bg)
+//       tbprint2(col, row+0, fg, bg, text)
+//       /*text = fmt.Sprintf(" on ")
+//       tbprint2(col, row+1, fg, bg, text)
+//       text = fmt.Sprintf(" %2d ", bg)
+//       tbprint2(col, row+2, fg, bg, text)*/
+//       //fmt.Println(text, col, row)
+//     }
+//   }
+//   for j, bg = range colorRange {
+//     tbprint2(j*8, 0, termbox.ColorDefault, bg, "       ")
+//     tbprint2(j*8, i+2, termbox.ColorDefault, bg, "       ")
+//   }
+//
+//   tbprint2(15, i+4, termbox.ColorDefault, termbox.ColorDefault,
+//     "Press any key to close...")
+//   termbox.Flush()
+//   termbox.PollEvent()
+//   termbox.Close()
+// }
 
 func termboxSample2() {
   var command_result = 0
@@ -131,12 +132,11 @@ func termboxSample2() {
   defer termbox.Close()
   termbox.SetInputMode(termbox.InputEsc)
 
-  redraw_all(command_result)
+  redraw_all()
 mainloop:
   for {
     switch ev := termbox.PollEvent(); ev.Type {
     case termbox.EventKey:
-      command_result = 0
       switch ev.Key {
       case termbox.KeyEsc:
         break mainloop
@@ -171,7 +171,7 @@ mainloop:
     case termbox.EventError:
       panic(ev.Err)
     }
-    redraw_all(command_result)
+    redraw_all()
   }
 }
 
@@ -182,18 +182,39 @@ func process_editbox_text() int {
     case "exit", "quit":
       return -1
       // add another case here for custom commands.
+    case "help":
+      fpc.Active = true
+
+    case "glance":
+      fpc.Active = false
     default:
-      edit_box.MoveCursorToBeginningOfTheLine()
-      edit_box.DeleteTheRestOfTheLine()
+
     }
+
+    edit_box.MoveCursorToBeginningOfTheLine()
+    edit_box.DeleteTheRestOfTheLine()
+
     return 1
-
 }
 
-
-func tbprint2(x, y int, fg, bg termbox.Attribute, msg string) {
-  for _, c := range msg {
-    termbox.SetCell(x, y, c, fg, bg)
-    x += 1
+func redraw_all() {
+  const coldef = termbox.ColorDefault
+  termbox.Clear(coldef, coldef)
+  w, h := termbox.Size()
+  if fpc.Active {
+    redraw_full_panel()
+  } else {
+    redraw_panel_gallery()
   }
+
+  redraw_edit_box(w,h,coldef)
+  termbox.Flush()
 }
+
+
+// func tbprint2(x, y int, fg, bg termbox.Attribute, msg string) {
+//   for _, c := range msg {
+//     termbox.SetCell(x, y, c, fg, bg)
+//     x += 1
+//   }
+// }

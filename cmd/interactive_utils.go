@@ -233,23 +233,10 @@ func (eb *EditBox) TextString() string {
 
 var edit_box EditBox
 
-//const edit_box_width = 30
 const top_instruction = "Type in ultralist commands"
 const bottom_instruction = "Type help for more info or exit to quit"
 
-func redraw_all(cr int) {
-  const coldef = termbox.ColorDefault
-  termbox.Clear(coldef, coldef)
-  w, h := termbox.Size()
-  if(cr > 0) {
-    redraw_full_panel()
-  } else {
-    redraw_edit_box(w,h,coldef)
-    redraw_panel_gallery()
-  }
 
-  termbox.Flush()
-}
 
 func redraw_edit_box(w,h int, coldef termbox.Attribute) {
   const colbg = termbox.ColorDarkGray

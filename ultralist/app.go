@@ -53,9 +53,9 @@ func NewAppWithPrintOptions(unicodeSupport bool, colorSupport bool) *App {
 	return app
 }
 
-func NewAppForPanel(unicodeSupport bool, p *Panel) *App {
+func NewAppForPanel(unicodeSupport bool, p *Panel, shorthand bool) *App {
 	//var printer Printer
-	printer := NewPanelPrinter(unicodeSupport, p)
+	printer := NewPanelPrinter(unicodeSupport, p, shorthand)
 
 	app := &App{
 		TodoList:  &TodoList{},

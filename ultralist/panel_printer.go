@@ -5,33 +5,16 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"text/tabwriter"
+	//"text/tabwriter"
 	"time"
 
-	"github.com/cheynewallace/tabby"
+	//"github.com/cheynewallace/tabby"
 	//"github.com/fatih/color"
 
 	"github.com/nsf/termbox-go"
 	"github.com/mattn/go-runewidth"
 	//"unicode/utf8"
 )
-
-// var (
-// 	blue        = color.New(0, color.FgBlue)
-// 	blueBold    = color.New(color.Bold, color.FgBlue)
-// 	green       = color.New(0, color.FgGreen)
-// 	greenBold   = color.New(color.Bold, color.FgGreen)
-// 	cyan        = color.New(0, color.FgCyan)
-// 	cyanBold    = color.New(color.Bold, color.FgCyan)
-// 	magenta     = color.New(0, color.FgMagenta)
-// 	magentaBold = color.New(color.Bold, color.FgMagenta)
-// 	red         = color.New(0, color.FgRed)
-// 	redBold     = color.New(color.Bold, color.FgRed)
-// 	white       = color.New(0, color.FgWhite)
-// 	whiteBold   = color.New(color.Bold, color.FgWhite)
-// 	yellow      = color.New(0, color.FgYellow)
-// 	yellowBold  = color.New(color.Bold, color.FgYellow)
-// )
 
 type Panel struct {
 	text     string
@@ -47,44 +30,40 @@ const coldef = termbox.ColorDefault
 func NewPanel(tt string, zx, pw int) *Panel {
 	p := &Panel{Zerox: zx, Panwid: pw, Title: tt}
 	p.cx = 0
-	p.cy = 3
+	p.cy = 2
 	return p
 }
 
 func (p *Panel) Reset() {
-	//const coldef = termbox.ColorDefault
 	_, h := termbox.Size()
 
 	fill(p.Zerox, 0, p.Panwid, h-3, termbox.Cell{Ch: ' '})
-	tbprint(p.Zerox + p.Panwid/2 - len(p.Title)/2, 1, coldef, coldef, p.Title)
+	tbprint(p.Zerox + p.Panwid/2 - len(p.Title)/2, 0, coldef, coldef, p.Title)
 }
 
-func (p *Panel) Draw(text string, color termbox.Attribute) {
-	//const coldef = termbox.ColorDefault
+func (p *Panel) Draw(text string, color termbox.Attribute, sh bool) {
 	for _, c := range text {
 		rw := runewidth.RuneWidth(c)
 		if c == '\n' {
 			p.cy++
 			p.cx = 0
-		} else if p.cx + rw > p.Panwid {
-			termbox.SetCell(p.Zerox + p.cx, p.cy, '-', color, coldef)
-			p.cy++
-			p.cx = 2
 		} else {
+			if p.cx + rw >= p.Panwid {
+				if sh {
+					termbox.SetCell(p.Zerox + p.cx, p.cy, '…', color, coldef)
+					// p.cy++
+					// p.cx = 0
+					break
+				} else {
+					termbox.SetCell(p.Zerox + p.cx, p.cy, '-', color, coldef)
+					p.cy++
+					p.cx = 2
+				}
+			}
 			termbox.SetCell(p.Zerox + p.cx, p.cy, c, color, coldef)
 			p.cx += rw
 		}
 	}
-
-// 	const coldef = termbox.ColorDefault
-// 	_, h := termbox.Size()
-// 	tbprint(p.Zerox + p.Panwid/2 - len(p.Title)/2, 1, coldef, coldef, p.Title)
-//
-// 	y := 3
-// 	for y < h-3 {
-// 		tbprint(p.Zerox, y, coldef, coldef, text)
-// 		y++
-// 	}
 }
 
 func (p *Panel) AddLine() {
@@ -110,67 +89,9 @@ func (p *Panel) DrawTab(text string, color termbox.Attribute, ts, tl int) {
 	}
 }
 
-func (p Panel) Write(pa []byte) (n int, err error) {
-	//cx,cy := 0,3
-// 	_, h := termbox.Size()
-// 	const coldef = termbox.ColorDefault
-//
-// 	tbprint(p.Zerox + p.Panwid/2 - len(p.Title)/2, 1, coldef, coldef, p.Title)
-//
-// 	t := pa
-// 	//lx := 0
-// 	//tabstop := 0
-// 	for {
-// 		//rx := lx - eb.line_voffset
-// 		if len(t) == 0 {
-// 			break
-// 		}
-//
-// // 		if lx == tabstop {
-// // 			tabstop += tabstop_length
-// // 		}
-// //
-// // 		if rx >= w {
-// // 			termbox.SetCell(x+w-1, y, arrowRight,
-// // 				colred, coldef)
-// // 			break
-// // 		}
-//
-// 		r, size := utf8.DecodeRune(t)
-// 		rw := runewidth.RuneWidth(r)
-// 		if p.cx + rw > p.Panwid {
-// 			p.cx = 2
-// 			p.cy++
-// 		}
-//
-// 		if r == '\n' {
-// 			p.cy++
-// // 			for ; lx < tabstop; lx++ {
-// // 				rx = lx - eb.line_voffset
-// // 				if rx >= w {
-// // 					goto next
-// // 				}
-// //
-// // 				if rx >= 0 {
-// // 					termbox.SetCell(x+rx, y, ' ', coldef, coldef)
-// // 				}
-// // 			}
-//
-// 		} else if p.cy >= h-3 {
-// 			break
-// 		} else {
-// 			termbox.SetCell(p.Zerox+p.cx, p.cy, r, coldef, coldef)
-// 			p.cx += rw
-// 			p.wc++
-// 			tbprint(p.Zerox + 1, h-5, coldef, coldef, strconv.Itoa(p.wc))
-// 		}
-// 	//next:
-// 		t = t[size:]
-// 	}
-
-
-	return len(pa),nil
-}
+// func (p Panel) Write(pa []byte) (n int, err error) {
+// 	return len(pa),nil
+// }
 
 func tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
 	for _, c := range msg {
@@ -189,16 +110,14 @@ func fill(x, y, w, h int, cell termbox.Cell) {
 
 // PanelPrinter is the default struct of this file
 type PanelPrinter struct {
-	//Writer         *io.Writer
-	panel *Panel
-	UnicodeSupport bool
+	panel 					*Panel
+	UnicodeSupport 	bool
+	shorthand 			bool
 }
 
 // NewPanelPrinter creates a new screeen printer.
-func NewPanelPrinter(unicodeSupport bool, p *Panel) *PanelPrinter {
-	// w := new(io.Writer)
-	// formatter := &PanelPrinter{Writer: w, UnicodeSupport: unicodeSupport}
-	formatter := &PanelPrinter{panel: p, UnicodeSupport: unicodeSupport}
+func NewPanelPrinter(unicodeSupport bool, p *Panel, sh bool) *PanelPrinter {
+	formatter := &PanelPrinter{panel: p, UnicodeSupport: unicodeSupport, shorthand: sh}
 	return formatter
 }
 
@@ -217,18 +136,19 @@ func (f *PanelPrinter) Print(groupedTodos *GroupedTodos, printNotes bool, showSt
 	}
 	sort.Strings(keys)
 
-	tabby := tabby.NewCustom(tabwriter.NewWriter(f.panel, 0, 0, 2, ' ', 0))
-	tabby.AddLine()
+	//tabby := tabby.NewCustom(tabwriter.NewWriter(f.panel, 0, 0, 2, ' ', 0))
+	//tabby.AddLine()
 	for _, key := range keys {
-		tabby.AddLine(cyan.Sprint(key))
-		f.panel.Draw(key, termbox.ColorCyan)
+		//tabby.AddLine(cyan.Sprint(key))
+		f.panel.Draw(key, termbox.ColorCyan, f.shorthand)
 		f.panel.AddLine()
 		for _, todo := range groupedTodos.Groups[key] {
-			f.printTodo(tabby, todo, id_length)
+			f.printTodo(todo, id_length)
 		}
-		tabby.AddLine()
+		//tabby.AddLine()
+		f.panel.AddLine()
 	}
-	tabby.Print()
+	//tabby.Print()
 }
 
 func longestID(groupedTodos *GroupedTodos) int {
@@ -244,42 +164,15 @@ func longestID(groupedTodos *GroupedTodos) int {
 	return res
 }
 
-func (f *PanelPrinter) printTodo(tabby *tabby.Tabby, todo *Todo, id_length int) {
+func (f *PanelPrinter) printTodo(todo *Todo, id_length int) {
 	var tdc = f.todoColor(todo)
 
 	f.panel.DrawTab(strconv.Itoa(todo.ID), termbox.ColorYellow, 0, id_length)
 	f.panel.DrawTab(f.formatCompleted(todo.Completed), termbox.ColorWhite, id_length, check_length)
 	f.panel.DrawTab(f.formatDue(todo.Due), tdc, id_length + check_length, date_length)
 	f.panel.cx = id_length + check_length + date_length
-	f.panel.Draw(todo.Subject, tdc)
+	f.panel.Draw(todo.Subject, tdc, f.shorthand)
 	f.panel.AddLine()
-// 	if showStatus {
-// 		tabby.AddLine(
-// 			f.formatID(todo.ID, todo.IsPriority),
-// 			f.formatCompleted(todo.Completed),
-// 			f.formatDue(todo.Due, todo.IsPriority, todo.Completed),
-// 			f.formatStatus(todo.Status, todo.IsPriority),
-// 			f.formatSubject(todo.Subject, todo.IsPriority))
-// 	} else {
-// 		tabby.AddLine(
-// 			f.formatID(todo.ID, todo.IsPriority),
-// 			f.formatCompleted(todo.Completed),
-// 			f.formatDue(todo.Due, todo.IsPriority, todo.Completed),
-// 			f.formatStatus(todo.Status, todo.IsPriority),
-// 			f.formatSubject(todo.Subject, todo.IsPriority))
-// 	}
-//
-// 	if printNotes {
-// 		for nid, note := range todo.Notes {
-// 			tabby.AddLine(
-// 				"  "+cyan.Sprint(strconv.Itoa(nid)),
-// 				white.Sprint(""),
-// 				white.Sprint(""),
-// 				white.Sprint(""),
-// 				white.Sprint(""),
-// 				white.Sprint(note))
-// 		}
-// 	}
 }
 
 func (f *PanelPrinter) todoColor(td *Todo) termbox.Attribute {
