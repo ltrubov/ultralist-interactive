@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"strings"
+  "strconv"
 
 	"github.com/spf13/cobra"
 	"github.com/ultralist/ultralist/ultralist"
@@ -30,7 +31,7 @@ func init() {
 		Long:    interactiveCmdLongDesc,
 		Short:   interactiveCmdDesc,
 		Run: func(cmd *cobra.Command, args []string) {
-			ultralist.NewAppWithPrintOptions(unicodeSupport, colorSupport).ListTodos(strings.Join(args, " "), listNotes, showStatus)
+			//ultralist.NewAppWithPrintOptions(unicodeSupport, colorSupport).ListTodos(strings.Join(args, " "), listNotes, showStatus)
       interactiveRunLoop()
 		},
 	}
@@ -44,22 +45,8 @@ func init() {
 
 func interactiveRunLoop() {
   termbox.Init()
-  //termboxSample()
   termboxSample2()
   os.Exit(0)
-
-  // reader := bufio.NewReader(os.Stdin)
-  // for {
-  //   fmt.Print("$ ")
-  //   cmdString, err := reader.ReadString('\n')
-  //   if err != nil {
-  //     fmt.Fprintln(os.Stderr, err)
-  //   }
-  //   err = runCommand(cmdString)
-  //   if err != nil {
-  //     fmt.Fprintln(os.Stderr, err)
-  //   }
-  // }
 }
 
 // func runCommand(commandStr string) error {
@@ -184,11 +171,15 @@ func process_editbox_text() int {
       // add another case here for custom commands.
     case "help":
       fpc.Active = true
+      fpc.CurrCmd = trimmed_downcased
 
     case "glance":
       fpc.Active = false
     default:
-
+      interpret_command(t)
+      if !fpc.Active {
+        run_command_in_background(t)
+      }
     }
 
     edit_box.MoveCursorToBeginningOfTheLine()
@@ -211,10 +202,79 @@ func redraw_all() {
   termbox.Flush()
 }
 
+func interpret_command(cmd string) {
+  comps := Map(strings.Split(cmd, " "), strings.TrimSpace)
+//   if strings.ToLower(comps[0]) == "uhelp" ||
+//      Contains(comps, "-h") ||
+//      Contains(comps, "--help") {
+//
+//     fpc.Active = true
+//     fpc.CurrCmd = "uhelp"
+//     fpc.CurrCmdArgs = strings.Join(RemoveHelpArgs(comps), " ")
+//   } else
+  if comps[0] == "l" || comps[0] == "list" {
+    fpc.Active = true
+    fpc.CurrCmd = "list"
+    fpc.CurrCmdArgs = strings.Join(comps[1:], " ")
+  } else if comps[0] == "version" {
+    fpc.Active = true
+    fpc.CurrCmd = "version"
+    fpc.CurrCmdArgs = ""
+  }
+}
 
-// func tbprint2(x, y int, fg, bg termbox.Attribute, msg string) {
-//   for _, c := range msg {
-//     termbox.SetCell(x, y, c, fg, bg)
-//     x += 1
-//   }
-// }
+func run_command_in_background(cmd string) {
+  comps := Map(strings.Split(cmd, " "), strings.TrimSpace)
+  cmd = comps[0]
+  args := strings.Join(comps[1:], " ")
+  app := ultralist.NewApp()
+  switch cmd {
+    case "add", "a":
+      app.AddTodo(args)
+    case "addnote", "an":
+      todoID, _ := strconv.Atoi(comps[1])
+      app.AddNote(todoID, strings.Join(comps[2:], " "))
+    case "archive", "ar":
+      app.ArchiveTodo(args)
+    case "unarchive", "uar":
+      app.UnarchiveTodo(args)
+    case "auth":
+      app.AuthWorkflow()
+    case "complete", "c":
+      app.CompleteTodo(args, false)
+    case "deletenote", "dn":
+      todoID, _ := strconv.Atoi(comps[1])
+      noteID, _ := strconv.Atoi(comps[2])
+      app.DeleteNote(todoID, noteID)
+    case "delete", "d", "rm":
+      app.DeleteTodo(args)
+    case "editnote", "en":
+      todoID, _ := strconv.Atoi(comps[1])
+      noteID, _ := strconv.Atoi(comps[2])
+      app.EditNote(todoID, noteID, strings.Join(comps[3:], " "))
+
+    case "edit", "e":
+      todoID, err := strconv.Atoi(comps[1])
+      if err != nil {
+        //fmt.Printf("Could not parse todo ID: '%s'\n", args[0])
+        return
+      }
+      app.EditTodo(todoID, strings.Join(comps[2:], " "))
+    case "init":
+      app.InitializeRepo()
+    case "prioritize", "p":
+      app.PrioritizeTodo(args)
+    case "status", "s":
+      app.SetTodoStatus(args)
+    case "web":
+      app.OpenWeb()
+    default:
+
+  }
+}
+
+
+
+
+
+

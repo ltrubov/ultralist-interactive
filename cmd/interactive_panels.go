@@ -44,6 +44,7 @@ func redraw_panel_gallery() {
 
 type FullPanelConfig struct {
   CurrCmd      string
+  CurrCmdArgs  string
   LastCmd      string
   Active       bool
 }
@@ -68,19 +69,47 @@ c) 'help' to see this help
 Ultralist commands modifying the todos state (adding, completing, deleting, renaming tasks) will redisplay the current
 state with data updates.
 
-The 'uhelp' command will run ultralist help, and display the help in a single panel covering the entire width of the
-terminal. The 'glance' command will return to the three-panel state.
-
 Running an ultralist 'list' command will display the results of that command in a single screenwide panel. Afterwards,
 modification commands will result in this command being re-run, redisplaying the tasks in the fullscreen panel. Run
 the 'glance' command to return to the 3-panel view.
 `
 
-func redraw_full_panel() {
-  w, _ := termbox.Size()
+const ul_title = "ULTRALIST"
 
+func redraw_full_panel() {
+  switch fpc.CurrCmd {
+    case "help":
+      draw_help()
+    // case "uhelp":
+    //   draw_ul_help()
+    case "list":
+      draw_ul_list()
+    case "version":
+      draw_ul_version()
+    default:
+      fpc.Active = false
+  }
+}
+
+func draw_help() {
+  w, _ := termbox.Size()
   panel := ultralist.NewPanel("HELP", 0, w)
   panel.Reset()
   panel.Draw(helptext, termbox.ColorDefault, true)
+}
+
+// func draw_ul_help() {}
+
+func draw_ul_list() {
+  w, _ := termbox.Size()
+  panel := ultralist.NewPanel(ul_title, 0, w)
+  ultralist.NewAppForPanel(true, panel, true).ListTodos(fpc.CurrCmdArgs, true, true)
+}
+
+func draw_ul_version() {
+  w, _ := termbox.Size()
+  panel := ultralist.NewPanel(ul_title, 0, w)
+  panel.Reset()
+  panel.Draw(fmt.Sprintf("Ultralist v%s\n", ultralist.VERSION), termbox.ColorDefault, true)
 }
 
