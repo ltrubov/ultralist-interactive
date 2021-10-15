@@ -248,6 +248,8 @@ func run_command_in_background(cmd string) int {
       app.AuthWorkflow()
     case "complete", "c":
       app.CompleteTodo(args, false)
+    case "uncomplete", "uc":
+      app.UncompleteTodo(args)
     case "deletenote", "dn":
       todoID, _ := strconv.Atoi(comps[1])
       noteID, _ := strconv.Atoi(comps[2])

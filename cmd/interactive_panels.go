@@ -13,8 +13,8 @@ import (
 var gallery_titles = [3]string{"TODAY", "THIS WEEK", "THIS MONTH"}
 var gallery_cmds = [3]string{
   "due:agenda group:project",
-  "dueafter:tod duebefore:sun group:project",
-  fmt.Sprintf("duebefore:%s01 dueafter:sat group:project", next_month_str())}
+  "due:thisweek dueafter:tod group:project",
+  "due:thismonth dueafter:sun group:project"}
 
 
 // var full_panel ultralist.Panel
